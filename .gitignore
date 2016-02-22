@@ -5,6 +5,18 @@ ehthumbs.db
 # Folder config file
 Desktop.ini
 
+# additional ignores added
+*.hex
+/build
+*.d
+*.o
+*.elf
+*.map
+*.mk
+*.xml
+*.properties
+*.bash
+
 # Recycle Bin used on file shares
 $RECYCLE.BIN/
 

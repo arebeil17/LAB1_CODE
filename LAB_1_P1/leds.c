@@ -6,6 +6,7 @@
 */
 
 #include <xc.h>
+#include "leds.h"
 #define INPUT 1
 #define OUTPUT 0
 #define OFF 0;
@@ -28,14 +29,17 @@ void turnOnLED(int led){
     {
         LATGbits.LATG12 = ON;
         LATGbits.LATG14 = OFF;
+
     }else if(led == 2)
     {
         LATGbits.LATG12 = OFF;
         LATGbits.LATG14 = ON;
+    
     }
     else
     {
         LATGbits.LATG12 = OFF;
         LATGbits.LATG14 = OFF;
+
     }
 }
