@@ -1,6 +1,6 @@
 /* 
  * File:   switch.h
- * Author: Garrett
+ * Author: Andres D. Rebeil
  *
  * Created on September 19, 2015, 10:46 AM
  */

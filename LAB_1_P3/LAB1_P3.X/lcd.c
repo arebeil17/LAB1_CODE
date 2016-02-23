@@ -1,6 +1,6 @@
 /*
  * File:   lcd.c
- * Authors:
+ * Authors: Andres D. Rebeil
  *
  * Created on Feb 16, 2016
  */
@@ -137,7 +137,7 @@ void printStringLCD(const char* s) {
         {   
             c = s[i];
             printCharLCD(c);
-        }   
+        } 
 }
 
 /*
@@ -215,6 +215,7 @@ void testLCD(){
     printStringLCD("Hello!");
     for(i = 0; i < 1000; i++) delayMs(1);
     //delaySec(1);
+    
 }
 
 void getString(int Rst, int i){

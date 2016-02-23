@@ -1,6 +1,6 @@
 /* 
 * File:   leds.h
-* Author: 
+* Author: Andres D. Rebeil
 *
 * Created on December 27, 2014, 1:31 PM
 */

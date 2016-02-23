@@ -1,6 +1,6 @@
 /*
  * File:   timer.c
- * Authors:
+ * Authors: Andres D. Rebeil
  *
  * Created on Feb 16, 2016
  */
@@ -38,9 +38,10 @@ void initTimer2(){
 }
 
 void delayMs(unsigned int delay){
+    IFS0bits.T2IF = 0;         // SETS FLAG
     TMR2 = 0;                  //RESET TIME
     PR2 = delay*624;           
-    IFS0bits.T2IF = 0;         // SETS FLAG
+    
     T2CONbits.ON = 1;          //ENABLE CN
     while(IFS0bits.T2IF == 0); //DELAY TILL FLAG IS RAISED
     T2CONbits.ON = 0;          //DISABLE CN
@@ -49,9 +50,10 @@ void delayMs(unsigned int delay){
 void delayUs(unsigned int delay){
 
     //TODO: Create a delay for "delay" micro seconds using timer 2
+    IFS0bits.T2IF = 0;         // SETS FLAG
     TMR2 = 0;                  //RESET TIME
     PR2 = delay;           //SET PRESCALAR
-    IFS0bits.T2IF = 0;         // SETS FLAG
+   
     T2CONbits.ON = 1;          //ENABLE CN
     while(IFS0bits.T2IF == 0); //DELAY TILL FLAG IS RAISED
     T2CONbits.ON = 0;          //DISABLE CN

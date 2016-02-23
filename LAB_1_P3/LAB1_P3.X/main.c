@@ -2,7 +2,7 @@
 //
 // File:         lab1p2.c
 // Date:         Feb 16, 2016
-// Authors:      Garrett Vanhoy
+// Authors:      Andres D. Rebeil
 //
 // Description: 
 // ******************************************************************************************* //
@@ -21,8 +21,10 @@ typedef enum stateTypeEnum{
 } stateType;
 
 //Volatile variable declarations
-volatile stateType state = INITIAL, t_state;
-volatile unsigned int SW2 = 0, SW1 = 0, i = 0, j = 0, temp = 0;
+volatile stateType state = RUN;
+volatile unsigned int SW2 = 0, SW1 = 1, i = 0, j = 0, temp = 0,
+                      Pressed_1 = 0, Pressed_2 = 0;
+
 // ******************************************************************************************* //
 
 int main(void)
@@ -44,26 +46,30 @@ int main(void)
     
     while(1)
     {    
-        t_state = state;
-        SW_ISR_Control(1);
-        if(state != RUN) delayMs(100); 
         
+        if(state == STOP) SW_ISR_Control(1);
+        else SW_ISR_Control(2);
+        
+
+        if(state != RUN) delayMs(50); 
+            
+        if((Pressed_1 == 1) || (Pressed_2 == 1)) delayMs(50);
             //SW2 HAS PRIORITY
             if((SW2 == 1) || (SW1 == 1)){
-                
-                delayMs(50);
+                delayMs(10);
                 switch(state){
-
+                    
                     case INITIAL:
                         if(SW2 == 1) state = RUN; 
                         SW2 = 0; SW1 = 0;
+                         i = 0;
                         turnOnLED(0);
                     break;
 
                     case RUN:
                         if(SW2 == 1) state = STOP; 
                         SW2 = 0; SW1 = 0;
-                        turnOnLED(1);
+                        //turnOnLED(1);
                     break;
                     case STOP:
                        if(SW2 == 1) state = RUN;
@@ -74,14 +80,16 @@ int main(void)
                     case RESET:
                         if(SW2 == 1) state = RUN;
                         SW2 = 0; SW1 = 0;
-                        turnOnLED(0);
+                        turnOnLED(2);
+                        i = 0; 
                     break;
                 }
-                delayMs(50);
+                delayMs(10);
             }
         
-        SW_ISR_Control(1);
-        if(state != RUN) {delayMs(100); SW_ISR_Control(0);}
+        
+        if(state != RUN) SW_ISR_Control(0);
+  
 
         if(SW2 == 0){
             if(state == INITIAL) {
@@ -91,7 +99,6 @@ int main(void)
                 printStringLCD("Stopped:");
                 moveCursorLCD(1,2);
                 getString(1,0);
-                delayMs(10);
             }else if(state == RUN){
                 turnOnLED(1);
                 delayMs(1);
@@ -103,13 +110,13 @@ int main(void)
                     getString(0,i);
                 }
                 i = i + 1;
-            }else if(state == STOP){
+            }
+            else if(state == STOP){
                 turnOnLED(2);
                 moveCursorLCD(1,1);
                 printStringLCD("Stopped:");
                 moveCursorLCD(1,2);
                 getString(0,temp);
-                delayMs(10);
             }
             else if(state == RESET){
                 turnOnLED(2);
@@ -120,7 +127,6 @@ int main(void)
                 getString(1,0);
             }
         }
-
     }
     return 0;
 }
@@ -133,29 +139,48 @@ int main(void)
 
 void __ISR(_CHANGE_NOTICE_VECTOR, IPL3SRS) _CNInterrupt(void){
     //----------------------------------------
-    //FOR RESET FUNCTION
-    IFS1bits.CNDIF = 0; //FLAG DOWN
-    PORTD; 
+   
     int k;
     k = PORTD;
     
+    temp = i;
+        
+    //CHECK SW1 TOGGLE
     if(state == STOP){
-        if(PORTDbits.RD6 == 1)  SW1 = 1;
+        
+        if((PORTDbits.RD6 == 1) && (Pressed_1 == 1))  { // not pressed
+            SW1 = 1;              //released
+            Pressed_1 = 0;
+            //next_state = RESET;
+        }
         else SW1 = 0;
-    }
-    
+   
+        if(PORTDbits.RD6 == 0) { //released
+            Pressed_1 = 1;
+            Pressed_2 = 0;
+        }
+    } else SW1 = 0;
     //----------------------------------------
     //FOR RUN/STOP FUNCTION
-    IFS1bits.CNAIF = 0; //FLAG DOWN
+    //IFS1bits.CNAIF = 0; //FLAG DOWN
     PORTA; 
-    j = PORTAbits.RA7;
-       
-    IFS0bits.T2IF = 1;         // SETS FLAG
+    j = PORTAbits.RA7; //RA7
     
-    temp = i;
+  
     
-    if(PORTAbits.RA7 == 1) SW2 = 1;
-    else SW2 = 0;
-    
-    state = t_state;
+    //CHECK SW2 TOGGLE
+    if((PORTAbits.RA7 == 1) && (Pressed_2 == 1)) { // not pressed
+        SW2 = 1;             //released
+        Pressed_2 = 0;
+        //if(state == STOP) next_state = RUN;
+    }
+    else SW2 = 0; 
+    if(PORTAbits.RA7 == 0) {
+        Pressed_2 = 1;
+        Pressed_1 = 0;
+    }
+    //IFS0bits.T2IF = 1;         // SETS FLAG AND STOPS TIMER 2
+    //RESET FLAGS
+    IFS1bits.CNDIF = 0; //FLAG DOWN
+    IFS1bits.CNAIF = 0; //FLAG DOWN
 }

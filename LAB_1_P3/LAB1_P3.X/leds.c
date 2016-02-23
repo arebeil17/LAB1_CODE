@@ -1,6 +1,6 @@
 /*
 * File:   leds.c
-* Author: 
+* Author: Andres D. Rebeil
 *
 * Created on December 27, 2014, 1:31 PM
 */
@@ -11,8 +11,8 @@
 #define OUTPUT 0
 #define OFF 0;
 #define ON 1;
-#define OFF_E 1 //external LEDS
-#define ON_E 0  //external LEDS
+#define OFF_E 0 //external LEDS
+#define ON_E 1  //external LEDS
 
 
 void initLEDs(){
